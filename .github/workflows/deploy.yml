@@ -2,10 +2,11 @@ name: Deploy to App Engine
 
 on:
   push:
-    branches: [work]
+    branches: [main]
 
 jobs:
   deploy:
+    environment: Deploy
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

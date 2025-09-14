@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { login } from '../api.js';
 import { useNavigate } from 'react-router-dom';
 
-export default function Login({ setToken }) {
+export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -11,8 +11,7 @@ export default function Login({ setToken }) {
   const handleSubmit = async e => {
     e.preventDefault();
     try {
-      const data = await login(email, password);
-      setToken(data.accessToken);
+      await login(email, password);
       navigate('/dashboard');
     } catch (err) {
       setError('Invalid credentials');
