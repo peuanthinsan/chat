@@ -36,4 +36,4 @@ docker run -p 8080:8080 --env-file backend/.env chat-app
 
 ## Deployment
 
-This repo includes `app.yaml` and a GitHub Actions workflow for deploying to Google App Engine. Configure `GCP_PROJECT` and `GCP_SA_KEY` secrets in your repository, then push to the `work` branch to trigger deployment.
+This repo includes `app.yaml` and a GitHub Actions workflow for deploying to Google App Engine. Configure `GCP_PROJECT`, `GCP_SA_KEY`, and `GCP_REGION` secrets in your repository, then push to the `main` branch to trigger deployment.
