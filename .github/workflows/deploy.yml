@@ -24,5 +24,10 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ${{ secrets.GCP_PROJECT }}
+      - name: Ensure App Engine app
+        run: |
+          if ! gcloud app describe --project="${{ secrets.GCP_PROJECT }}" >/dev/null 2>&1; then
+            gcloud app create --project="${{ secrets.GCP_PROJECT }}" --region="${{ secrets.GCP_REGION }}" --quiet
+          fi
       - name: Deploy
         run: gcloud app deploy --quiet
