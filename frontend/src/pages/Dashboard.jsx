@@ -1,27 +1,27 @@
 import { useState, useEffect } from 'react';
 import { getProfile, uploadAvatar } from '../api.js';
 
-export default function Dashboard({ token }) {
+export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const data = await getProfile(token);
+        const data = await getProfile();
         setUser(data);
       } catch (err) {
         setError('Failed to load profile');
       }
     };
     fetchProfile();
-  }, [token]);
+  }, []);
 
   const handleFile = async e => {
     const file = e.target.files[0];
     if (file) {
       try {
-        const updated = await uploadAvatar(token, file);
+        const updated = await uploadAvatar(file);
         setUser(updated);
       } catch (err) {
         setError('Upload failed');

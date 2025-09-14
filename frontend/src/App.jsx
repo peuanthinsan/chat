@@ -1,20 +1,23 @@
-import { Routes, Route, Link, Navigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { Routes, Route, Link, Navigate, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Dashboard from './pages/Dashboard.jsx';
-import { refreshToken } from './api.js';
+import { refreshToken, logout as apiLogout, getAuthToken } from './api.js';
 
 function App() {
-  const [token, setToken] = useState(null);
+  const token = getAuthToken();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    refreshToken().then(data => setToken(data.accessToken)).catch(() => {});
-  }, []);
+    if (!token) {
+      refreshToken().catch(() => {});
+    }
+  }, [token]);
 
   const logout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
-    setToken(null);
+    await apiLogout();
+    navigate('/login');
   };
 
   return (
@@ -32,9 +35,9 @@ function App() {
       </nav>
       <Routes>
         <Route path="/" element={token ? <Navigate to="/dashboard" /> : <h1>Welcome</h1>} />
-        <Route path="/login" element={<Login setToken={setToken} />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={token ? <Dashboard token={token} /> : <Navigate to="/login" />} />
+        <Route path="/dashboard" element={token ? <Dashboard /> : <Navigate to="/login" />} />
       </Routes>
     </>
   );
