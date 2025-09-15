@@ -1,2 +1,4 @@
 runtime: custom
 env: flex
+env_variables:
+  GCS_BUCKET: ${{ secrets.GCS_BUCKET }}
