@@ -12,7 +12,8 @@ router.get('/me', auth, async (req, res) => {
     const user = await User.findById(req.userId).select('-password -refreshToken');
     res.json(user);
   } catch (err) {
-    res.status(500).json({ message: 'Server error' });
+    console.error(err);
+    res.status(500).json({ message: err.message || 'Server error' });
   }
 });
 
@@ -23,7 +24,8 @@ router.post('/avatar', auth, upload.single('avatar'), async (req, res) => {
     const user = await User.findByIdAndUpdate(req.userId, { avatarUrl: url }, { new: true }).select('-password -refreshToken');
     res.json(user);
   } catch (err) {
-    res.status(500).json({ message: 'Server error' });
+    console.error(err);
+    res.status(500).json({ message: err.message || 'Server error' });
   }
 });
 
