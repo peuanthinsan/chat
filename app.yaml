@@ -1,7 +1,7 @@
 runtime: custom
 env: flex
 env_variables:
-  GCS_BUCKET: ${{ secrets.GCS_BUCKET }}
-  JWT_REFRESH: ${{ secrets.JWT_REFRESH }}
-  JWT_SECRET: ${{ secrets.JWT_SECRET }}
-  MONGO_URI: ${{ secrets.MONGO_URI }}
+  GCS_BUCKET: GCS_BUCKET
+  JWT_REFRESH: JWT_REFRESH
+  JWT_SECRET: JWT_SECRET
+  MONGO_URI: MONGO_URI

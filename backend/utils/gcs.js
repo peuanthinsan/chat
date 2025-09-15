@@ -4,7 +4,7 @@ const storage = new Storage();
 
 const getBucket = () => {
   const bucketName = process.env.GCS_BUCKET;
-  if (!bucketName) {
+  if (!bucketName || bucketName === 'GCS_BUCKET') {
     throw new Error('GCS_BUCKET environment variable is not set');
   }
   return storage.bucket(bucketName);
