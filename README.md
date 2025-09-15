@@ -11,7 +11,7 @@ cp backend/.env.example backend/.env
 
 Set the following variables:
 
-- `MONGO_URI` – connection string to external MongoDB
+- `MONGO_URI` – connection string to external MongoDB (e.g., `mongodb://localhost:27017/chat`)
 - `JWT_SECRET` – secret for access tokens
 - `JWT_REFRESH` – secret for refresh tokens
 - `GCS_BUCKET` – Google Cloud Storage bucket for avatars
