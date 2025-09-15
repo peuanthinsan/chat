@@ -32,3 +32,15 @@ export const uploadFile = async (file, destination) => {
       .end(file.buffer);
   });
 };
+
+export const deleteFile = async url => {
+  const bucket = getBucket();
+  const prefix = `https://storage.googleapis.com/${bucket.name}/`;
+  if (!url.startsWith(prefix)) return;
+  const filePath = url.slice(prefix.length);
+  try {
+    await bucket.file(filePath).delete({ ignoreNotFound: true });
+  } catch (err) {
+    console.error('Failed to delete file', err);
+  }
+};
