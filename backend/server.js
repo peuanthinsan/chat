@@ -20,9 +20,9 @@ app.use('/api/users', userRoutes);
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
-// Express 5 uses path-to-regexp v6, which disallows bare '*' wildcards.
-// Use a named parameter with a repeating modifier to implement a catch-all route.
-app.get('/:path*', (req, res) => {
+// Express 5 includes path-to-regexp v8, which requires wildcard segments to
+// have a name. Use a named wildcard group to implement a catch-all route.
+app.get('/{*path}', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
 });
 
