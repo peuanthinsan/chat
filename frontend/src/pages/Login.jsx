@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { login } from '../api.js';
 import { useNavigate } from 'react-router-dom';
+import { Container, TextField, Button, Typography, Box } from '@mui/material';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -19,12 +20,18 @@ export default function Login() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Login</h2>
-      {error && <p>{error}</p>}
-      <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
-      <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
-      <button type="submit">Login</button>
-    </form>
+    <Container maxWidth="sm">
+      <Box component="form" onSubmit={handleSubmit} sx={{ mt: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Typography variant="h5">Login</Typography>
+        {error && (
+          <Typography color="error">
+            {error}
+          </Typography>
+        )}
+        <TextField label="Email" value={email} onChange={e => setEmail(e.target.value)} fullWidth />
+        <TextField type="password" label="Password" value={password} onChange={e => setPassword(e.target.value)} fullWidth />
+        <Button type="submit" variant="contained">Login</Button>
+      </Box>
+    </Container>
   );
 }
