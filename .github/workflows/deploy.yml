@@ -34,7 +34,16 @@ jobs:
           if ! gcloud app describe --project="${{ secrets.GCP_PROJECT }}" >/dev/null 2>&1; then
             gcloud app create --project="${{ secrets.GCP_PROJECT }}" --region="${{ secrets.GCP_REGION }}" --quiet
           fi
+      - name: Configure app.yaml
+        run: |
+          cat > app.yaml <<EOF
+          runtime: custom
+          env: flex
+          env_variables:
+            GCS_BUCKET: "$GCS_BUCKET"
+            JWT_REFRESH: "$JWT_REFRESH"
+            JWT_SECRET: "$JWT_SECRET"
+            MONGO_URI: "$MONGO_URI"
+          EOF
       - name: Deploy
-        run: >-
-          gcloud app deploy --quiet --set-env-vars \
-          "GCS_BUCKET=$GCS_BUCKET,JWT_REFRESH=$JWT_REFRESH,JWT_SECRET=$JWT_SECRET,MONGO_URI=$MONGO_URI"
+        run: gcloud app deploy app.yaml --quiet
