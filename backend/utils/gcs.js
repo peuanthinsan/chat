@@ -13,13 +13,22 @@ const getBucket = () => {
 export const uploadFile = async (file, destination) => {
   const bucket = getBucket();
   const blob = bucket.file(destination);
-  const stream = blob.createWriteStream({ resumable: false, contentType: file.mimetype });
+  const stream = blob.createWriteStream({
+    resumable: false,
+    contentType: file.mimetype,
+  });
   return new Promise((resolve, reject) => {
-    stream.on('finish', () => {
-      const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
-      resolve(publicUrl);
-    })
-    .on('error', reject)
-    .end(file.buffer);
+    stream
+      .on('finish', async () => {
+        try {
+          await blob.makePublic();
+          const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
+          resolve(publicUrl);
+        } catch (err) {
+          reject(err);
+        }
+      })
+      .on('error', reject)
+      .end(file.buffer);
   });
 };
