@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { login } from '../api.js';
 import { useNavigate } from 'react-router-dom';
-import { Container, TextField, Button, Typography, Box } from '@mui/material';
+import { Container, TextField, Button, Typography, Box, Snackbar, Alert } from '@mui/material';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [toast, setToast] = useState({ open: false, message: '', severity: 'error' });
   const navigate = useNavigate();
 
   const handleSubmit = async e => {
@@ -15,23 +15,33 @@ export default function Login() {
       await login(email, password);
       navigate('/dashboard');
     } catch (err) {
-      setError('Invalid credentials');
+      setToast({ open: true, message: 'Invalid credentials', severity: 'error' });
     }
+  };
+
+  const handleToastClose = (_, reason) => {
+    if (reason === 'clickaway') return;
+    setToast(prev => ({ ...prev, open: false }));
   };
 
   return (
     <Container maxWidth="sm">
       <Box component="form" onSubmit={handleSubmit} sx={{ mt: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Typography variant="h5">Login</Typography>
-        {error && (
-          <Typography color="error">
-            {error}
-          </Typography>
-        )}
         <TextField label="Email" value={email} onChange={e => setEmail(e.target.value)} fullWidth />
         <TextField type="password" label="Password" value={password} onChange={e => setPassword(e.target.value)} fullWidth />
         <Button type="submit" variant="contained">Login</Button>
       </Box>
+      <Snackbar
+        open={toast.open}
+        autoHideDuration={4000}
+        onClose={handleToastClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert onClose={handleToastClose} severity={toast.severity} variant="filled" sx={{ width: '100%' }}>
+          {toast.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }
