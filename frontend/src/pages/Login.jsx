@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Container, TextField, Button, Typography, Box, Snackbar, Alert } from '@mui/material';
 
 export default function Login() {
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [toast, setToast] = useState({ open: false, message: '', severity: 'error' });
   const navigate = useNavigate();
@@ -12,7 +12,15 @@ export default function Login() {
   const handleSubmit = async e => {
     e.preventDefault();
     try {
-      await login(email, password);
+      const value = identifier.trim();
+      if (!value) {
+        setToast({ open: true, message: 'Please enter your email or username', severity: 'error' });
+        return;
+      }
+      if (value !== identifier) {
+        setIdentifier(value);
+      }
+      await login(value, password);
       navigate('/dashboard');
     } catch (err) {
       setToast({ open: true, message: 'Invalid credentials', severity: 'error' });
@@ -28,8 +36,23 @@ export default function Login() {
     <Container maxWidth="sm">
       <Box component="form" onSubmit={handleSubmit} sx={{ mt: 4, display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Typography variant="h5">Login</Typography>
-        <TextField label="Email" value={email} onChange={e => setEmail(e.target.value)} fullWidth />
-        <TextField type="password" label="Password" value={password} onChange={e => setPassword(e.target.value)} fullWidth />
+        <TextField
+          label="Email or Username"
+          value={identifier}
+          onChange={e => setIdentifier(e.target.value)}
+          fullWidth
+          required
+          autoComplete="username"
+        />
+        <TextField
+          type="password"
+          label="Password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          fullWidth
+          required
+          autoComplete="current-password"
+        />
         <Button type="submit" variant="contained">Login</Button>
       </Box>
       <Snackbar
