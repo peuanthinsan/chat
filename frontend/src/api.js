@@ -141,4 +141,19 @@ export const deleteUser = async id => {
   return data;
 };
 
+export const getSubscriptionPlan = async () => {
+  const { data } = await api.get('/billing/plan');
+  return data;
+};
+
+export const createCheckoutSession = async () => {
+  const { data } = await api.post('/billing/checkout-session');
+  return data;
+};
+
+export const createPortalSession = async () => {
+  const { data } = await api.post('/billing/portal-session');
+  return data;
+};
+
 export default api;

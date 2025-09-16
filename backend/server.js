@@ -6,10 +6,15 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
+import billingRoutes from './routes/billing.js';
+import stripeWebhook from './routes/stripeWebhook.js';
 
 dotenv.config();
 
 const app = express();
+
+app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), stripeWebhook);
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -17,6 +22,7 @@ const PORT = process.env.PORT || 8080;
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/billing', billingRoutes);
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 app.use(express.static(path.join(__dirname, '../frontend/dist')));

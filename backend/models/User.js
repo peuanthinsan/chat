@@ -23,7 +23,14 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['user', 'admin'],
     default: 'user'
-  }
+  },
+  stripeCustomerId: { type: String, index: true },
+  stripeSubscriptionId: { type: String, index: true },
+  subscriptionStatus: { type: String, default: 'inactive' },
+  subscriptionCurrentPeriodEnd: { type: Date },
+  subscriptionCancelAt: { type: Date },
+  subscriptionCancelAtPeriodEnd: { type: Boolean, default: false },
+  subscriptionPriceId: { type: String }
 }, { timestamps: true });
 
 export default mongoose.model('User', userSchema);
