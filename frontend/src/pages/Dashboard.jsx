@@ -2,6 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import { getProfile, uploadAvatar } from '../api.js';
 import { Container, Typography, Avatar, Button, Snackbar, Alert } from '@mui/material';
 
+const MAX_AVATAR_SIZE_MB = 5;
+const MAX_AVATAR_SIZE_BYTES = MAX_AVATAR_SIZE_MB * 1024 * 1024;
+
 export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [error, setError] = useState('');
@@ -28,14 +31,35 @@ export default function Dashboard() {
   const handleFile = async e => {
     const file = e.target.files[0];
     if (file) {
+      if (!file.type.startsWith('image/')) {
+        setToast({ open: true, message: 'Only image files are allowed', severity: 'error' });
+        if (fileInput.current) {
+          fileInput.current.value = '';
+        }
+        return;
+      }
+
+      if (file.size > MAX_AVATAR_SIZE_BYTES) {
+        setToast({
+          open: true,
+          message: `Avatar must be ${MAX_AVATAR_SIZE_MB}MB or smaller`,
+          severity: 'error'
+        });
+        if (fileInput.current) {
+          fileInput.current.value = '';
+        }
+        return;
+      }
+
       try {
         const updated = await uploadAvatar(file);
         setUser(updated);
         setError('');
         setToast({ open: true, message: 'Avatar updated', severity: 'success' });
       } catch (err) {
-        setError('Upload failed');
-        setToast({ open: true, message: 'Upload failed', severity: 'error' });
+        const message = err.response?.data?.message || 'Upload failed';
+        setError(message);
+        setToast({ open: true, message, severity: 'error' });
       } finally {
         if (fileInput.current) {
           fileInput.current.value = '';
@@ -68,7 +92,13 @@ export default function Dashboard() {
           {user.avatarUrl && (
             <Avatar src={user.avatarUrl} alt="avatar" sx={{ width: 100, height: 100, my: 2 }} />
           )}
-          <input type="file" ref={fileInput} onChange={handleFile} style={{ display: 'none' }} />
+          <input
+            type="file"
+            ref={fileInput}
+            onChange={handleFile}
+            accept="image/*"
+            style={{ display: 'none' }}
+          />
           <Button variant="contained" onClick={handleUploadClick} sx={{ mt: 2 }}>
             Upload Avatar
           </Button>
