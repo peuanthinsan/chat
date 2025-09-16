@@ -17,8 +17,11 @@ export default function Register() {
       return;
     }
     try {
-      await register(email, password);
-      setToast({ open: true, message: 'Registered, please login', severity: 'success' });
+      const data = await register(email, password);
+      const message = data?.role === 'admin'
+        ? 'Registered as the first admin. Please login'
+        : 'Registered, please login';
+      setToast({ open: true, message, severity: 'success' });
       setTimeout(() => navigate('/login'), 1000);
     } catch (err) {
       const message = err.response?.data?.message || 'Registration failed';
