@@ -72,14 +72,29 @@ api.interceptors.response.use(
   }
 );
 
-export const login = async (email, password) => {
-  const { data } = await api.post('/auth/login', { email, password });
+export const login = async (identifier, password) => {
+  const { data } = await api.post('/auth/login', { identifier, password });
   setAuthToken(data.accessToken);
   return data;
 };
 
-export const register = async (email, password) => {
-  const { data } = await api.post('/auth/register', { email, password });
+export const register = async ({ email, password, username, firstName, lastName, avatar }) => {
+  const form = new FormData();
+  form.append('email', email);
+  form.append('password', password);
+  form.append('username', username);
+  if (typeof firstName === 'string' && firstName.trim()) {
+    form.append('firstName', firstName.trim());
+  }
+  if (typeof lastName === 'string' && lastName.trim()) {
+    form.append('lastName', lastName.trim());
+  }
+  if (avatar) {
+    form.append('avatar', avatar);
+  }
+  const { data } = await api.post('/auth/register', form, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
   return data;
 };
 
@@ -99,6 +114,11 @@ export const getProfile = async () => {
   return data;
 };
 
+export const updateProfile = async updates => {
+  const { data } = await api.patch('/users/me', updates);
+  return data;
+};
+
 export const uploadAvatar = async file => {
   const form = new FormData();
   form.append('avatar', file);
@@ -113,6 +133,11 @@ export const getUsers = async () => {
 
 export const updateUserRole = async (id, role) => {
   const { data } = await api.patch(`/users/${id}/role`, { role });
+  return data;
+};
+
+export const deleteUser = async id => {
+  const { data } = await api.delete(`/users/${id}`);
   return data;
 };
 
