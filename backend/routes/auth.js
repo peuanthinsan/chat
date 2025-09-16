@@ -5,7 +5,9 @@ import User from '../models/User.js';
 
 const router = Router();
 
-const generateAccessToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '15m' });
+const generateAccessToken = user => (
+  jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '15m' })
+);
 const generateRefreshToken = (id) => jwt.sign({ id }, process.env.JWT_REFRESH, { expiresIn: '7d' });
 
 router.post('/register', async (req, res) => {
@@ -15,8 +17,10 @@ router.post('/register', async (req, res) => {
     const exists = await User.findOne({ email });
     if (exists) return res.status(409).json({ message: 'User exists' });
     const hashed = await bcrypt.hash(password, 10);
-    const user = await User.create({ email, password: hashed });
-    res.status(201).json({ id: user._id, email: user.email });
+    const adminExists = await User.exists({ role: 'admin' });
+    const role = adminExists ? 'user' : 'admin';
+    const user = await User.create({ email, password: hashed, role });
+    res.status(201).json({ id: user._id, email: user.email, role: user.role });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
@@ -29,7 +33,11 @@ router.post('/login', async (req, res) => {
     if (!user) return res.status(401).json({ message: 'Invalid credentials' });
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(401).json({ message: 'Invalid credentials' });
-    const accessToken = generateAccessToken(user._id);
+    if (!user.role) {
+      user.role = 'user';
+      await user.save();
+    }
+    const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user._id);
     user.refreshToken = refreshToken;
     await user.save();
@@ -47,7 +55,11 @@ router.post('/refresh', async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_REFRESH);
     const user = await User.findById(decoded.id);
     if (!user || user.refreshToken !== token) return res.status(403).json({ message: 'Invalid refresh token' });
-    const accessToken = generateAccessToken(user._id);
+    if (!user.role) {
+      user.role = 'user';
+      await user.save();
+    }
+    const accessToken = generateAccessToken(user);
     res.json({ accessToken });
   } catch (err) {
     res.status(403).json({ message: 'Invalid refresh token' });

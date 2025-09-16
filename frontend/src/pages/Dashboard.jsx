@@ -89,6 +89,9 @@ export default function Dashboard() {
       {!loading && user && (
         <>
           <Typography>{user.email}</Typography>
+          <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1 }}>
+            Role: {user.role}
+          </Typography>
           {user.avatarUrl && (
             <Avatar src={user.avatarUrl} alt="avatar" sx={{ width: 100, height: 100, my: 2 }} />
           )}

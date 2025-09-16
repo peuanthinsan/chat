@@ -1,7 +1,9 @@
 import { Router } from 'express';
 import multer from 'multer';
+import mongoose from 'mongoose';
 import User from '../models/User.js';
 import auth from '../middleware/auth.js';
+import requireAdmin from '../middleware/requireAdmin.js';
 import { uploadFile, deleteFile } from '../utils/gcs.js';
 
 const router = Router();
@@ -40,6 +42,55 @@ router.get('/me', auth, async (req, res) => {
   try {
     const user = await User.findById(req.userId).select('-password -refreshToken');
     res.json(user);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || 'Server error' });
+  }
+});
+
+router.get('/', auth, requireAdmin, async (req, res) => {
+  try {
+    const users = await User.find().select('-password -refreshToken').sort({ createdAt: -1 });
+    res.json(users);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || 'Server error' });
+  }
+});
+
+router.patch('/:id/role', auth, requireAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { role } = req.body;
+
+  if (!['user', 'admin'].includes(role)) {
+    return res.status(400).json({ message: 'Invalid role' });
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: 'Invalid user id' });
+  }
+
+  try {
+    const targetUser = await User.findById(id);
+    if (!targetUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (targetUser.role === 'admin' && role !== 'admin') {
+      const adminCount = await User.countDocuments({ role: 'admin' });
+      if (adminCount <= 1) {
+        return res.status(400).json({ message: 'At least one admin is required' });
+      }
+    }
+
+    targetUser.role = role;
+    await targetUser.save();
+
+    const sanitized = targetUser.toObject();
+    delete sanitized.password;
+    delete sanitized.refreshToken;
+
+    res.json(sanitized);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: err.message || 'Server error' });

@@ -17,10 +17,22 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Dashboard from './pages/Dashboard.jsx';
+import Admin from './pages/Admin.jsx';
 import { refreshToken, logout as apiLogout, getAuthToken } from './api.js';
+
+const getRoleFromToken = token => {
+  if (!token) return null;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload?.role || null;
+  } catch {
+    return null;
+  }
+};
 
 function App() {
   const token = getAuthToken();
+  const role = getRoleFromToken(token);
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
@@ -65,6 +77,13 @@ function App() {
                     <ListItemText primary="Dashboard" />
                   </ListItemButton>
                 </ListItem>
+                {role === 'admin' && (
+                  <ListItem disablePadding>
+                    <ListItemButton component={RouterLink} to="/admin">
+                      <ListItemText primary="Admin" />
+                    </ListItemButton>
+                  </ListItem>
+                )}
                 <ListItem disablePadding>
                   <ListItemButton onClick={logout}>
                     <ListItemText primary="Logout" />
@@ -93,6 +112,12 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={token ? <Dashboard /> : <Navigate to="/login" />} />
+        <Route
+          path="/admin"
+          element={
+            token ? (role === 'admin' ? <Admin /> : <Navigate to="/dashboard" />) : <Navigate to="/login" />
+          }
+        />
       </Routes>
     </>
   );
