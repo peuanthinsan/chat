@@ -13,12 +13,14 @@ const sanitizeUser = user => {
   const sanitized = user.toObject();
   delete sanitized.password;
   delete sanitized.refreshToken;
+  delete sanitized.stripeCustomerId;
+  delete sanitized.stripeSubscriptionId;
   return sanitized;
 };
 
 router.get('/me', auth, async (req, res) => {
   try {
-    const user = await User.findById(req.userId).select('-password -refreshToken');
+    const user = await User.findById(req.userId).select('-password -refreshToken -stripeCustomerId -stripeSubscriptionId');
     res.json(user);
   } catch (err) {
     console.error(err);

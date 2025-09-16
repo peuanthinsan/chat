@@ -15,6 +15,19 @@ Set the following variables:
 - `JWT_SECRET` – secret for access tokens
 - `JWT_REFRESH` – secret for refresh tokens
 - `GCS_BUCKET` – Google Cloud Storage bucket for avatars
+- `STRIPE_SECRET_KEY` – Stripe secret key used to create checkout and portal sessions
+- `STRIPE_PRICE_ID` – Stripe Price ID for the subscription plan
+- `STRIPE_WEBHOOK_SECRET` – webhook signing secret for Stripe events
+- `FRONTEND_URL` – optional override for checkout success/cancel URLs (defaults to the request origin)
+
+### Stripe setup
+
+Create a recurring price in your Stripe dashboard and configure the environment variables above.
+Expose the webhook endpoint `https://<your-domain>/api/stripe/webhook` (or the local
+equivalent when using the Stripe CLI) so that subscription events can update user records.
+
+Users can start a subscription from the dashboard. Active subscribers can open the Stripe billing
+portal to manage payment methods or cancel their plan.
 
 ## Development
 
