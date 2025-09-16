@@ -15,6 +15,27 @@ Set the following variables:
 - `JWT_SECRET` – secret for access tokens
 - `JWT_REFRESH` – secret for refresh tokens
 - `GCS_BUCKET` – Google Cloud Storage bucket for avatars
+- `STRIPE_SECRET_KEY` – Stripe secret key used by the backend API
+- `STRIPE_PRICE_ID` – ID of the recurring price to sell via subscriptions
+- `STRIPE_WEBHOOK_SECRET` – signing secret for the Stripe webhook endpoint (recommended)
+- `CLIENT_URL` – optional base URL for redirecting after checkout (falls back to request origin)
+
+For the frontend, create `frontend/.env` and expose your publishable key:
+
+```
+VITE_STRIPE_PUBLISHABLE_KEY=pk_test_1234
+```
+
+### Stripe Webhooks
+
+When running locally, forward Stripe webhooks to the development server so subscription updates
+are reflected in MongoDB:
+
+```
+stripe listen --forward-to localhost:8080/api/subscriptions/webhook
+```
+
+Copy the webhook signing secret from the command output into `STRIPE_WEBHOOK_SECRET`.
 
 ## Development
 

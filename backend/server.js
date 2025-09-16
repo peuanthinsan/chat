@@ -6,10 +6,14 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
+import subscriptionRoutes, { stripeWebhookHandler } from './routes/subscription.js';
 
 dotenv.config();
 
 const app = express();
+
+app.post('/api/subscriptions/webhook', express.raw({ type: 'application/json' }), stripeWebhookHandler);
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -17,6 +21,7 @@ const PORT = process.env.PORT || 8080;
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/subscriptions', subscriptionRoutes);
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 app.use(express.static(path.join(__dirname, '../frontend/dist')));

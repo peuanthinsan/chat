@@ -116,4 +116,20 @@ export const updateUserRole = async (id, role) => {
   return data;
 };
 
+export const getSubscriptionStatus = async () => {
+  const { data } = await api.get('/subscriptions/status');
+  return data;
+};
+
+export const createCheckoutSession = async priceId => {
+  const payload = priceId ? { priceId } : {};
+  const { data } = await api.post('/subscriptions/checkout-session', payload);
+  return data;
+};
+
+export const createBillingPortalSession = async () => {
+  const { data } = await api.post('/subscriptions/portal-session');
+  return data;
+};
+
 export default api;
